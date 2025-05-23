@@ -1,5 +1,3 @@
-version: '3.5'
-
 volumes:
   ts_state:
 
@@ -10,7 +8,7 @@ services:
     volumes:
       - ./files:/input:ro
       - ./output_files:/output
-    command: parsedmarc -c /parsedmarc.ini /input/* --debug
+    command: parsedmarc -c /parsedmarc.ini /input/*
     depends_on:
       - elasticsearch
       - tailscale
@@ -22,7 +20,7 @@ services:
     environment:
       - discovery.type=single-node
     volumes:
-      - ./elastic_data:/usr/share/elasticsearch/data
+      - ./elastic_data:/var/share/elasticsearch/data
     depends_on:
       - tailscale
     network_mode: service:tailscale
@@ -30,8 +28,6 @@ services:
 
   grafana:
     build: ./grafana/
-    ports:
-      - 3000:3000
     user: root
     environment:
       GF_INSTALL_PLUGINS: grafana-piechart-panel,grafana-worldmap-panel
@@ -45,7 +41,7 @@ services:
     image: tailscale/tailscale:latest
     hostname: ${TS_HOSTNAME}
     environment:
-      - TS_EXTRA_ARGS=--advertise-tags=tag:container
+      - TS_EXTRA_ARGS=--accept-dns=false --advertise-tags=tag:container
       - TS_STATE_DIR=/var/lib/tailscale
       - TS_SERVE_CONFIG=/config/ts-serve.json
     volumes:
